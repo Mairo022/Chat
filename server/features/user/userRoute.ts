@@ -1,6 +1,6 @@
 import express from "express";
 import userController from "./userController";
-import catchErrors from "../utils/errorHandler";
+import { catchErrors } from "../utils/errorHandler";
 
 const router = express.Router()
 

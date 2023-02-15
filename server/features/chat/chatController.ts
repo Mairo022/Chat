@@ -2,11 +2,13 @@ import ChatMessageModel from './chatMessageModel'
 import UserModel from "../user/userModel";
 import { IMessage } from "./chatTypes";
 import { roomExists } from "../room/roomController"
+import { throwError } from "../utils/errorHandler";
 
 async function sendMessage(req, res): Promise<void> {
     const { message, sender, roomID }: IMessage = req.body
 
-    if (message === undefined || sender === undefined || roomID === undefined) throw ("Message is in an incorrect form")
+    if (message === undefined || sender === undefined || roomID === undefined)
+        throwError ("Message is in an incorrect form", 400)
 
     const chatMessage = new ChatMessageModel({
         message: message,
@@ -24,8 +26,8 @@ async function getMessages(req, res): Promise<void> {
     const limit = req.query.limit && req.query.limit <= 100 ? req.query.limit : 50
     const fromMessage = req.query.id
 
-    if (!roomID) throw ({ message: "Missing room ID", code: 400 })
-    if (!await roomExists(roomID)) throw ({ message: "Unknown room", code: 404 })
+    if (!roomID) throwError ("Missing room ID", 400)
+    if (!await roomExists(roomID)) throwError ("Unknown room", 404)
 
     const fromDate = fromMessage && fromMessage !== ""
                      ? await ChatMessageModel
@@ -51,7 +53,7 @@ async function getMessages(req, res): Promise<void> {
 async function searchUser(req, res): Promise<void> {
     const username = req.query.username
 
-    if (!username) throw ({ message: "Missing username", code: 400 })
+    if (!username) throwError ("Missing username", 400)
 
     const user = await UserModel
         .find({

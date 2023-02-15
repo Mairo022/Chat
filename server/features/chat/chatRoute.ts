@@ -1,5 +1,5 @@
 import express from 'express'
-import catchErrors from "../utils/errorHandler";
+import { catchErrors } from "../utils/errorHandler";
 import chatController from "./chatController";
 import { jwtAuth } from "../../middleware/authMiddleware";
 

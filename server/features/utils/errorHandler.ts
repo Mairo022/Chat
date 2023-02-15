@@ -8,4 +8,11 @@ const catchErrors = func =>
                 res.status(code).json({ message })
             })
 
-export default catchErrors
+const throwError = (message: string, code: number) => {
+    throw ({ message, code })
+}
+
+export {
+    catchErrors,
+    throwError
+}
