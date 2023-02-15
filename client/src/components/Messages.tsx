@@ -1,6 +1,6 @@
 import React, { SyntheticEvent, useEffect, useRef, useState } from "react";
 import { IGetMessage, IMessagesProps } from "../types/chatTypes";
-import { sendMessageRequest, messagesRequest } from '../services/chatServices'
+import { messageSendRequest, messagesGetRequest } from '../services/chatServices'
 import { useView } from "../context/viewContext";
 import { useNavigate } from "react-router-dom";
 import { NavigateFunction } from "react-router/lib/hooks";
@@ -45,7 +45,7 @@ function Messages(props: IMessagesProps): JSX.Element {
             return handleErrorOnSend()
         }
 
-        sendMessageRequest({
+        messageSendRequest({
             message: messageInput,
             sender: senderID,
             roomID: roomID
@@ -145,7 +145,7 @@ function Messages(props: IMessagesProps): JSX.Element {
     function loadMessages(): void {
         if (roomID === "" || roomID === undefined) return
 
-        messagesRequest(roomID)
+        messagesGetRequest(roomID)
             .then(response => response.data)
             .then(messages => { setMessageHistory(messages) })
             .catch(e => {

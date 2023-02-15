@@ -1,6 +1,6 @@
 import RoomModel from "./roomModel";
 import { randomUUID } from "crypto";
-import { ICreateRoom, IUserRooms } from "./roomTypes";
+import { ICreateRoom } from "./roomTypes";
 import ChatMessageModel from "../chat/chatMessageModel";
 
 const roomExists = (id: string) => RoomModel.exists({ room: id })
@@ -24,26 +24,28 @@ async function createRoom(req, res): Promise<void> {
 }
 
 async function userRooms(req, res): Promise<void> {
-    const { userID }: IUserRooms = req.body
+    const { userID } = req.params
 
-    if (!userID) throw ("userID is missing")
+    if (!userID) throw ({ message: "Missing user", code: 400 })
 
-    const rooms = await RoomModel.find({ users: userID })
+    const rooms = await RoomModel
+        .find({ users: userID })
         .select({ _id: false, room: true, users: true })
         .populate('users', 'username')
 
-    const roomsWithMessage = await Promise.all(rooms.map(async room => {
-        const lastMessage = await ChatMessageModel
-            .findOne({ room: room.room })
-            .sort({ createdAt: 'descending' })
-            .select({ _id: false, message: true, createdAt: true })
+    const roomsWithMessage = await Promise.all(
+        rooms.map(async room => {
+            const lastMessage = await ChatMessageModel
+                .findOne({ room: room.room })
+                .sort({ createdAt: 'descending' })
+                .select({ _id: false, message: true, createdAt: true })
 
-        return {
-            room: room.room,
-            users: room.users,
-            lastMessage: lastMessage?.message,
-            lastMessageSent: lastMessage?.createdAt
-        }
+            return {
+                room: room.room,
+                users: room.users,
+                lastMessage: lastMessage?.message,
+                lastMessageSent: lastMessage?.createdAt
+            }
     }))
 
     res.status(200).json({ rooms: roomsWithMessage })

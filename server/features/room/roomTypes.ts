@@ -3,10 +3,6 @@ interface IRoomModel {
     users: Array<string>
 }
 
-interface IUserRooms {
-    userID: string
-}
-
 interface ICreateRoom {
     userID: string
     targetUserID: string
@@ -14,6 +10,5 @@ interface ICreateRoom {
 
 export type {
     ICreateRoom,
-    IUserRooms,
     IRoomModel
 }

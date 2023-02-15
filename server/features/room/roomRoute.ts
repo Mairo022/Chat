@@ -5,8 +5,8 @@ import { jwtAuth } from "../../middleware/authMiddleware";
 
 const router = express.Router()
 
-router.post('/create', jwtAuth, catchErrors(roomController.createRoom))
-router.post('/', jwtAuth, catchErrors(roomController.userRooms))
+router.post('/', jwtAuth, catchErrors(roomController.createRoom))
+router.get('/:userID', jwtAuth, catchErrors(roomController.userRooms))
 
 export {
     router as roomRoute

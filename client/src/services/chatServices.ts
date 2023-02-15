@@ -7,39 +7,33 @@ const axiosChat: AxiosInstance = axios.create({
     withCredentials: true
 })
 
-function sendMessageRequest(message: ISendMessage): AxiosPromise {
-    return axiosChat.post(`${ URL }/chat/send-message`, {
+function messageSendRequest(message: ISendMessage): AxiosPromise {
+    return axiosChat.post(`${ URL }/chat/messages`, {
         message: message.message,
         sender: message.sender,
         roomID: message.roomID
     })
 }
 
-const messagesRequest = (roomID: string): AxiosPromise =>
-    axiosChat.post(`${ URL }/chat/get-messages`, {
-        roomID
-    })
+const messagesGetRequest = (roomID: string, messageID: string = ""): AxiosPromise =>
+    axiosChat.get(`${ URL }/chat/messages/${ roomID }?limit=50&id=${ messageID }`)
 
-const newRoomRequest = (userID: string, targetUserID: string): AxiosPromise =>
-    axiosChat.post(`${ URL }/chat/rooms/create/`, {
+const roomCreateRequest = (userID: string, targetUserID: string): AxiosPromise =>
+    axiosChat.post(`${ URL }/chat/rooms`, {
         userID,
         targetUserID
     })
 
 const userRoomsRequest = (userID: string): AxiosPromise =>
-    axiosChat.post(`${ URL }/chat/rooms/`, {
-        userID
-    })
+    axiosChat.get(`${ URL }/chat/rooms/${ userID }`)
 
 const searchUsersRequest = (username: string): AxiosPromise =>
-    axiosChat.post(`${ URL }/chat/search-user/`, {
-        username
-    })
+    axiosChat.get(`${ URL }/chat/search-user?username=${ username }`)
 
 export {
-    sendMessageRequest,
-    messagesRequest,
+    messageSendRequest,
+    messagesGetRequest,
     userRoomsRequest,
-    newRoomRequest,
+    roomCreateRequest,
     searchUsersRequest
 }

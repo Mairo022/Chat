@@ -1,5 +1,5 @@
 import { SyntheticEvent, useEffect, useState } from "react";
-import { userRoomsRequest, newRoomRequest, searchUsersRequest } from '../services/chatServices'
+import { userRoomsRequest, roomCreateRequest, searchUsersRequest } from '../services/chatServices'
 import { IGetMessage, IRoom, IRoomFetched, ISearchUsers, IRoomsProps } from "../types/chatTypes";
 import { useView } from "../context/viewContext";
 import { useNavigate } from "react-router-dom";
@@ -138,13 +138,13 @@ function Rooms(props: IRoomsProps): JSX.Element {
         const targetUserID = targetUser._id
         const targetUsername = targetUser.username
 
-        newRoomRequest(userID, targetUserID)
+        roomCreateRequest(userID, targetUserID)
             .then(response => response.data)
             .then(room => {
                 joinRoom(room.roomID, targetUsername)
             })
             .catch(error => {
-                if (error.response.data.message === "Room already exists") {
+                if (error.response.data.message === "Room already exists" || error.response.status === 400) {
                     const roomID: string = rooms
                         .find((room: IRoom) => room.users[0]._id === targetUserID || room.users[1]._id === targetUserID)!.id
 

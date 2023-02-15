@@ -11,17 +11,7 @@ interface IMessageModel {
     createdAt: Date
 }
 
-interface IGetMessages {
-    roomID: string
-}
-
-interface ISearchUsers {
-    username: string
-}
-
 export {
     IMessage,
     IMessageModel,
-    IGetMessages,
-    ISearchUsers
 }
