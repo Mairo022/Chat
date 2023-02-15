@@ -21,7 +21,7 @@ const io = new Server(httpServer, {
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', clientURL)
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST')
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE')
     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, content-type, Authorization');
     res.setHeader('Access-Control-Allow-Credentials', 'true')
     next()

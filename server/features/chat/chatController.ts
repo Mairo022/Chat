@@ -64,7 +64,20 @@ async function searchUser(req, res): Promise<void> {
     res.status(200).json(user)
 }
 
+async function deleteMessage(req, res) {
+    const messageID = req.query.id
+
+    if (!messageID) throwError("Missing message identifier", 400)
+
+    await ChatMessageModel
+        .deleteOne({ _id: messageID })
+        .catch(() => { throwError("Message does not exist", 404) })
+
+    res.status(204).send()
+}
+
 export default {
+    deleteMessage,
     sendMessage,
     getMessages,
     searchUser

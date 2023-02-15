@@ -8,6 +8,7 @@ const router = express.Router()
 router.post("/messages", jwtAuth, catchErrors(chatController.sendMessage))
 router.get("/messages/:roomID", jwtAuth, catchErrors(chatController.getMessages))
 router.get("/search-user", jwtAuth, catchErrors(chatController.searchUser))
+router.delete("/messages", jwtAuth, catchErrors(chatController.deleteMessage))
 
 export {
     router as chatRoute
