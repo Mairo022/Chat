@@ -59,6 +59,7 @@
       color: variables.$color-text-gray-light
 
     &__message
+      position: relative
       display: flex
       width: fit-content
       max-width: 90%
@@ -67,6 +68,25 @@
       border-radius: 15px
       white-space: pre-line
       font-size: variables.$font-size-big
+
+      &:hover .messages__message__delete
+        visibility: visible
+
+      &__delete
+        display: flex
+        position: absolute
+        top: 50%
+        left: -38px
+        transform: translateY(-50%)
+        visibility: hidden
+        height: 100%
+        padding: 10px 15px
+        cursor: pointer
+
+        &__img
+          display: block
+          width: 14px
+          filter: brightness(2) hue-rotate(10deg) saturate(0.7)
 
       &--last
         clear: both

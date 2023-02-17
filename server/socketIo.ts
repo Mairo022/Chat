@@ -1,3 +1,5 @@
+import ChatMessageModel from "./features/chat/chatMessageModel";
+
 function socketIo(io) {
     const connectedUsers: Map<string, string> = new Map()
 
@@ -11,7 +13,9 @@ function socketIo(io) {
             socket.join(roomID)
         })
 
-        socket.on("private message", ({ message, sender, receiver, roomID, isInitial }) => {
+        socket.on("private message", async ({ message, sender, receiver, senderID, roomID, isInitial }) => {
+            const id = await messageID(senderID)
+
             if (isInitial === true) {
                 const receiverSocketID = connectedUsers.get(receiver)
                 const senderSocketID = connectedUsers.get(sender)
@@ -26,11 +30,19 @@ function socketIo(io) {
             }
 
             io.to(roomID).emit("private message", {
+                _id: id,
                 message,
-                sender: { username: sender },
+                sender: {
+                    _id: senderID,
+                    username: sender
+                },
                 createdAt: new Date(),
                 roomID,
             })
+        })
+
+        socket.on("message deleted", roomID => {
+            io.to(roomID).emit("message deleted")
         })
 
         socket.on("disconnect", () => {
@@ -48,6 +60,15 @@ function socketIo(io) {
 
 const clientsCountLogger = (clients: number) => {
     console.log(`Connection established with ${ clients } clients`)
+}
+
+const messageID = async (senderID: string): Promise<string> => {
+    const message = await ChatMessageModel
+        .findOne({ sender: senderID })
+        .sort({ createdAt: 'descending' })
+        .select("_id")
+
+    return String(message?._id)
 }
 
 export default socketIo

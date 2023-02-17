@@ -18,6 +18,9 @@ function messageSendRequest(message: ISendMessage): AxiosPromise {
 const messagesGetRequest = (roomID: string, messageID: string = ""): AxiosPromise =>
     axiosChat.get(`${ URL }/chat/messages/${ roomID }?limit=50&id=${ messageID }`)
 
+const messageDeleteRequest = (messageID: string): AxiosPromise =>
+    axiosChat.delete(`${ URL }/chat/messages?id=${ messageID }`)
+
 const roomCreateRequest = (userID: string, targetUserID: string): AxiosPromise =>
     axiosChat.post(`${ URL }/chat/rooms`, {
         userID,
@@ -31,6 +34,7 @@ const searchUsersRequest = (username: string): AxiosPromise =>
     axiosChat.get(`${ URL }/chat/search-user?username=${ username }`)
 
 export {
+    messageDeleteRequest,
     messageSendRequest,
     messagesGetRequest,
     userRoomsRequest,

@@ -5,6 +5,8 @@ import { useView } from "../context/viewContext";
 import { useNavigate } from "react-router-dom";
 import { NavigateFunction } from "react-router/lib/hooks";
 import "../styles/components/Messages.sass";
+import deleteButtonImg from "../assets/images/delete-btn.svg"
+import DeleteMessageDialog from "./DeleteMessageDialog";
 
 function Messages(props: IMessagesProps): JSX.Element {
     const senderName = props.username
@@ -15,6 +17,10 @@ function Messages(props: IMessagesProps): JSX.Element {
 
     const navigate: NavigateFunction = useNavigate()
     const roommate = localStorage.getItem("roommate")
+
+    const [showDeleteDialog, setShowDeleteDialog] = useState<boolean>(false)
+    const [delState, setDelState] = useState<boolean>(true)
+    const [messageID, setMessageID] = useState<string>()
 
     const [privateMessage, setPrivateMessage] = useState<IGetMessage>()
     const [messageInput, setMessageInput] = useState<string>("")
@@ -32,7 +38,8 @@ function Messages(props: IMessagesProps): JSX.Element {
             sender: { username: "Server", _id: "server" },
             message: message,
             roomID: roomID ? roomID : "",
-            createdAt: String(new Date())
+            createdAt: String(new Date()),
+            _id: ""
         })
 
     const onMessageSubmit = (e: SyntheticEvent): void => {
@@ -54,6 +61,7 @@ function Messages(props: IMessagesProps): JSX.Element {
                 socket.emit("private message", {
                     message: messageInput,
                     sender: senderName,
+                    senderID: senderID,
                     receiver: roommate,
                     roomID: roomID,
                     isInitial: !messageHistory.length
@@ -92,6 +100,13 @@ function Messages(props: IMessagesProps): JSX.Element {
                 <React.Fragment key={ id }>
                     { showDate && messageDateJSX }
                     <div className={`messages__message messages__message--${sender}`}>
+                        { sender === "me" &&
+                            <div className="messages__message__delete" data-id={ message._id }
+                                onClick={ e => handleDelete(e) }
+                            >
+                                <img className="messages__message__delete__img" alt="delete" src={ deleteButtonImg }/>
+                            </div>
+                        }
                         <div className="messages__message__text">
                             { message.message }
                         </div>
@@ -142,6 +157,15 @@ function Messages(props: IMessagesProps): JSX.Element {
         setMessageHistory(oldMessages => [ ...oldMessages, errorMessage("Error sending the message") ])
     }
 
+    function handleDelete(e: React.MouseEvent<HTMLDivElement>) {
+        const id: string | null = e.currentTarget.getAttribute("data-id")
+
+        if (id === null) return
+
+        setMessageID(id)
+        setShowDeleteDialog(true)
+    }
+
     function loadMessages(): void {
         if (roomID === "" || roomID === undefined) return
 
@@ -169,17 +193,29 @@ function Messages(props: IMessagesProps): JSX.Element {
         })
     }
 
+    function socketOnMessageDeleted(): void {
+        socket.on("message deleted", () => {
+            setDelState(state => !state)
+        })
+    }
+
     useEffect(() => {
         socketOnPrivateMessage()
+        socketOnMessageDeleted()
 
         return () => {
             socket.removeListener("private message")
+            socket.removeListener("message deleted")
         }
     }, [])
 
     useEffect(() => {
         updateMessages()
     }, [privateMessage])
+
+    useEffect(() => {
+        loadMessages()
+    }, [delState])
 
     useEffect(() => {
         loadMessages()
@@ -203,9 +239,15 @@ function Messages(props: IMessagesProps): JSX.Element {
     }, [isMobile, isInRoom])
 
     return roomID !== undefined && roomID !== "" ?
-           <div className="Messages" style={
-            { "display": hideComponent ? "none" : "grid" }
-           }>
+           <div className="Messages" style={{ "display": hideComponent ? "none" : "grid" }}>
+               {
+                   showDeleteDialog &&
+                   <DeleteMessageDialog
+                       socket={ socket }
+                       roomID={ roomID }
+                       messageID={ messageID }
+                       setVisible={ setShowDeleteDialog }/>
+               }
                <div className="header">
                    <div className="header__rooms_btn" onClick={ () => { onHideMessages() } }>
                        { isMobile ? "←" : "" }

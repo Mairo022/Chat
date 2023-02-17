@@ -1,6 +1,7 @@
 import { Socket } from "socket.io-client";
 
 interface  IGetMessage {
+    _id: string
     message: string
     sender: {
         _id: string
@@ -59,6 +60,13 @@ interface ISearchUsers {
     _id: string
 }
 
+interface IDeleteMessageDialog {
+    socket: Socket
+    roomID: string
+    messageID: string | undefined
+    setVisible: (state: boolean) => void
+}
+
 export type {
     IGetMessage,
     ISendMessage,
@@ -67,5 +75,6 @@ export type {
     IRoomFetched,
     IUserControlsProps,
     IRoomsProps,
-    ISearchUsers
+    ISearchUsers,
+    IDeleteMessageDialog
 }

@@ -192,6 +192,12 @@ function Rooms(props: IRoomsProps): JSX.Element {
         })
     }
 
+    function socketOnMessageDeleted(): void {
+        socket.on("message deleted", () => {
+            userRooms()
+        })
+    }
+
     function socketOnNewRoom(): void {
         socket.on("new room", () => {
             userRooms()
@@ -201,11 +207,13 @@ function Rooms(props: IRoomsProps): JSX.Element {
     useEffect(() => {
         userRooms()
         socketOnPrivateMessage()
+        socketOnMessageDeleted()
         socketOnReconnect()
         socketOnNewRoom()
 
         return () => {
             socket.removeListener("private message")
+            socket.removeListener("message deleted")
             socket.removeListener("connect")
             socket.removeListener("new room")
         }
